@@ -16,10 +16,11 @@ const ALL_NAV = [
 ]
 
 const ROLE_LABELS = {
-  admin: 'Administrador',
+  admin:    'Administrador',
   advogado: 'Advogado',
   marketing: 'Marketing',
-  captacao: 'Captação',
+  captacao:  'Captação',
+  time:      'Time Moskalenko',
 }
 
 const GROUP_LABELS = { principal: 'Principal', conteudo: 'Conteúdo', sistema: 'Sistema' }

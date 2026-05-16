@@ -5,6 +5,7 @@ const USERS = [
   { id: 2, email: 'advogado@moskalenko.com', password: 'adv123', name: 'Advogado', role: 'advogado', pages: ['roteiros','crm'] },
   { id: 3, email: 'marketing@moskalenko.com', password: 'mkt123', name: 'Yasmim', role: 'marketing', pages: ['roteiros','crm','criativos'] },
   { id: 4, email: 'captacao@moskalenko.com', password: 'cap123', name: 'Captacao', role: 'captacao', pages: ['crm'] },
+  { id: 5, email: 'time@moskalenko.com', password: 'time123', name: 'Time', role: 'time', pages: ['dashboard','campanhas','leads','crm','roteiros','criativos','config'] },
 ]
 
 const AuthContext = createContext(null)
