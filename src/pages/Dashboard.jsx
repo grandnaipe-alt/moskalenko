@@ -1,5 +1,5 @@
 import { AreaChart, Area, BarChart, Bar, PieChart, Pie, Cell, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from 'recharts'
-import { DollarSign, Users, Target, TrendingUp, Eye, MousePointer } from 'lucide-react'
+import { DollarSign, Users, Target, MessageCircle, Eye, LayoutGrid } from 'lucide-react'
 import { PLATFORMS, formatCurrency, formatNumber, formatPercent } from '../data/data'
 import { useData } from '../context/DataContext'
 import CSVUploader from '../components/shared/CSVUploader'
@@ -30,19 +30,19 @@ export default function Dashboard() {
       <div className="mb-5">
         <h1 className="font-display text-2xl md:text-3xl font-bold text-white">Dashboard</h1>
         <p className="text-white/30 text-sm mt-1">
-          {isCustom ? 'Dados importados do CSV' : 'Visão geral das campanhas — Maio 2026'}
+          {isCustom ? 'Dados importados do CSV' : '01 a 16 de Maio 2026 · Meta Ads'}
         </p>
       </div>
 
       <CSVUploader />
 
       <div className="grid grid-cols-2 xl:grid-cols-3 2xl:grid-cols-6 gap-4 mb-8">
-        <KPI label="Investimento"    value={formatCurrency(overviewMetrics.totalInvestment)}  icon={DollarSign}    color="#3a60ff" delay={1} />
-        <KPI label="Total de Leads"  value={formatNumber(overviewMetrics.totalLeads)}          icon={Users}         color="#E8A820" delay={2} />
-        <KPI label="Custo por Lead"  value={formatCurrency(overviewMetrics.costPerLead)}       icon={Target}        color="#22c55e" delay={3} />
-        <KPI label="Conversão"       value={formatPercent(overviewMetrics.conversionRate)}     icon={TrendingUp}    color="#a855f7" delay={4} />
-        <KPI label="Impressões"      value={formatNumber(overviewMetrics.totalImpressions)}    icon={Eye}           color="#3a60ff" delay={5} sub="este mês" />
-        <KPI label="Cliques"         value={formatNumber(overviewMetrics.totalClicks)}          icon={MousePointer}  color="#E8A820" delay={5} />
+        <KPI label="Investimento"     value={formatCurrency(overviewMetrics.totalInvestment)}  icon={DollarSign}    color="#3a60ff" delay={1} />
+        <KPI label="Leads WhatsApp"   value={formatNumber(overviewMetrics.totalLeads)}          icon={MessageCircle} color="#25D366" delay={2} sub="conversas iniciadas" />
+        <KPI label="Custo por Lead"   value={formatCurrency(overviewMetrics.costPerLead)}       icon={Target}        color="#22c55e" delay={3} />
+        <KPI label="Seguidores"       value={formatNumber(overviewMetrics.totalFollowers ?? 0)} icon={Users}         color="#a855f7" delay={4} sub="novos seguidores" />
+        <KPI label="Visitas ao Perfil" value={formatNumber(overviewMetrics.totalProfileVisits ?? overviewMetrics.totalImpressions ?? 0)} icon={Eye} color="#E8A820" delay={5} />
+        <KPI label="Campanhas Ativas" value={overviewMetrics.activeCampaigns ?? overviewMetrics.totalClicks ?? 0} icon={LayoutGrid} color="#3a60ff" delay={5} sub="Meta Ads" />
       </div>
 
       <div className="grid grid-cols-1 xl:grid-cols-3 gap-6 mb-6">
@@ -133,7 +133,7 @@ export default function Dashboard() {
                   </div>
                   <div className="flex justify-between mt-1">
                     <span className="text-white/25 text-xs">{formatCurrency(pm.investment)} investidos</span>
-                    <span className="text-white/25 text-xs">CTR {formatPercent(pm.ctr)}</span>
+                    <span className="text-white/25 text-xs">{pm.ctr > 0 ? `CTR ${formatPercent(pm.ctr)}` : 'Meta Ads'}</span>
                   </div>
                 </div>
               )

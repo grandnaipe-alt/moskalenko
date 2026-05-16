@@ -1,5 +1,5 @@
 import { useState } from 'react'
-import { PLATFORMS, formatCurrency, formatPercent } from '../data/data'
+import { PLATFORMS, CAMPAIGN_TYPES, formatCurrency, formatPercent, formatNumber } from '../data/data'
 import { Search, Plus, Pause, Play } from 'lucide-react'
 import { useData } from '../context/DataContext'
 import CSVUploader from '../components/shared/CSVUploader'
@@ -9,10 +9,12 @@ export function Campanhas() {
   const { campaigns } = data
   const [search, setSearch] = useState('')
   const [plat, setPlat] = useState('all')
+  const [typeFilter, setTypeFilter] = useState('all')
 
   const filtered = campaigns.filter(c =>
     c.name.toLowerCase().includes(search.toLowerCase()) &&
-    (plat === 'all' || c.platform === plat)
+    (plat === 'all' || c.platform === plat) &&
+    (typeFilter === 'all' || c.type === typeFilter)
   )
 
   return (
@@ -36,6 +38,14 @@ export function Campanhas() {
             className="w-full glass rounded-xl pl-9 pr-4 py-2.5 text-sm text-white placeholder-white/20 outline-none border border-transparent focus:border-brand-500/40 transition-colors"/>
         </div>
         <div className="flex glass rounded-xl overflow-hidden">
+          {[['all','Todas'],['whatsapp','WhatsApp'],['seguidores','Seguidores']].map(([v,l]) => (
+            <button key={v} onClick={() => setTypeFilter(v)}
+              className={`px-4 py-2.5 text-xs font-semibold transition-all ${typeFilter===v ? 'bg-brand-500/20 text-white' : 'text-white/40 hover:text-white/70'}`}>
+              {l}
+            </button>
+          ))}
+        </div>
+        <div className="flex glass rounded-xl overflow-hidden">
           {['all','google','meta','tiktok'].map(p => (
             <button key={p} onClick={() => setPlat(p)}
               className={`px-4 py-2.5 text-xs font-semibold transition-all ${plat===p ? 'bg-brand-500/20 text-white' : 'text-white/40 hover:text-white/70'}`}>
@@ -49,43 +59,59 @@ export function Campanhas() {
         <table className="w-full min-w-[700px]">
           <thead>
             <tr className="border-b border-white/5">
-              {['Campanha','Plataforma','Área','Status','Orçamento','Gasto','Leads','CPL','Ações'].map(h => (
+              {['Campanha','Tipo','Status','Gasto','Resultado','Custo/Result.','Seguidores','Ações'].map(h => (
                 <th key={h} className="text-left text-xs font-semibold text-white/25 uppercase tracking-wider py-4 px-4">{h}</th>
               ))}
             </tr>
           </thead>
           <tbody className="divide-y divide-white/5">
             {filtered.map(c => {
-              const p = PLATFORMS[c.platform]
+              const p  = PLATFORMS[c.platform]
+              const ct = CAMPAIGN_TYPES[c.type]
               const active = c.status === 'ativa'
+              const isWpp = c.type === 'whatsapp'
               return (
                 <tr key={c.id} className="hover:bg-white/2 transition-colors group">
-                  <td className="py-4 px-4 text-white text-sm font-medium max-w-[200px]">
-                    <p className="truncate">{c.name}</p>
+                  <td className="py-4 px-4 max-w-[220px]">
+                    <p className="text-white text-sm font-medium truncate">{c.name}</p>
+                    <span className="text-xs px-1.5 py-0.5 rounded-full font-medium mt-1 inline-block" style={{background:p?.bg,color:p?.color}}>{p?.name ?? c.platform}</span>
                   </td>
                   <td className="py-4 px-4">
-                    <span className="text-xs px-2 py-0.5 rounded-full font-medium" style={{background:p?.bg,color:p?.color}}>{p?.name ?? c.platform}</span>
+                    <span className="text-xs px-2.5 py-1 rounded-full font-semibold" style={{background:ct?.bg,color:ct?.color}}>
+                      {ct?.label}
+                    </span>
                   </td>
-                  <td className="py-4 px-4 text-white/50 text-sm">{c.area}</td>
                   <td className="py-4 px-4">
                     <span className={`text-xs px-2.5 py-1 rounded-full font-medium ${active ? 'bg-emerald-500/15 text-emerald-400' : 'bg-yellow-500/15 text-yellow-400'}`}>
                       {active ? 'Ativa' : 'Pausada'}
                     </span>
                   </td>
-                  <td className="py-4 px-4 text-white/70 text-sm">{formatCurrency(c.budget)}/dia</td>
+                  <td className="py-4 px-4 text-white text-sm">{formatCurrency(c.spent)}</td>
                   <td className="py-4 px-4">
-                    <div>
-                      <span className="text-white text-sm">{formatCurrency(c.spent)}</span>
-                      <div className="w-16 h-1 bg-white/5 rounded-full mt-1">
-                        <div className="h-full bg-brand-400 rounded-full" style={{width:c.budget>0?`${Math.min((c.spent/c.budget)*100,100)}%`:'0%'}}/>
+                    {isWpp ? (
+                      <div>
+                        <p className="text-white font-semibold text-sm">{c.leads} leads</p>
+                        <p className="text-white/30 text-xs">conversas WhatsApp</p>
                       </div>
-                    </div>
+                    ) : (
+                      <div>
+                        <p className="text-white font-semibold text-sm">{formatNumber(c.results)} visitas</p>
+                        <p className="text-white/30 text-xs">ao perfil</p>
+                      </div>
+                    )}
                   </td>
-                  <td className="py-4 px-4 text-white font-semibold text-sm">{c.leads}</td>
                   <td className="py-4 px-4">
-                    <span className={`text-sm font-medium ${c.cpl > 0 && c.cpl < 8 ? 'text-emerald-400' : 'text-white'}`}>
-                      {c.cpl > 0 ? formatCurrency(c.cpl) : '—'}
+                    <span className={`text-sm font-medium ${isWpp && c.cpl < 10 ? 'text-emerald-400' : 'text-white/70'}`}>
+                      {formatCurrency(c.costPerResult)}
                     </span>
+                    <p className="text-white/25 text-xs">{isWpp ? '/lead' : '/resultado'}</p>
+                  </td>
+                  <td className="py-4 px-4">
+                    {c.followers > 0 ? (
+                      <span className="text-white text-sm font-medium">+{formatNumber(c.followers)}</span>
+                    ) : (
+                      <span className="text-white/25 text-sm">—</span>
+                    )}
                   </td>
                   <td className="py-4 px-4">
                     <button className="w-7 h-7 glass rounded-lg flex items-center justify-center text-white/30 hover:text-white opacity-0 group-hover:opacity-100 transition-all">

@@ -77,14 +77,16 @@ export function parseMetricsCSV(text) {
   const isGoogle = headers.some(h => h.includes('impr.') || h.includes('avg. cpc') || h.includes('cost / conv'))
 
   const C = {
-    name:   findCol(headers, 'campaign name', 'nome da campanha', 'campaign', 'campanha'),
-    spent:  findCol(headers, 'amount spent', 'valor gasto', 'cost', 'custo', 'spend', 'gasto'),
-    impr:   findCol(headers, 'impressions', 'impressões', 'impr.'),
-    clicks: findCol(headers, 'link clicks', 'cliques no link', 'clicks', 'cliques'),
-    leads:  findCol(headers, 'results', 'resultados', 'conversions', 'conversões'),
-    cpl:    findCol(headers, 'cost per result', 'custo por resultado', 'cost / conv', 'custo / conv'),
-    budget: findCol(headers, 'budget', 'orçamento', 'daily budget'),
-    status: findCol(headers, 'delivery', 'veiculação', 'campaign status', 'status'),
+    name:      findCol(headers, 'campaign name', 'nome da campanha', 'campaign', 'campanha'),
+    spent:     findCol(headers, 'amount spent', 'valor gasto', 'cost', 'custo', 'spend', 'gasto'),
+    impr:      findCol(headers, 'impressions', 'impressões', 'impr.'),
+    clicks:    findCol(headers, 'link clicks', 'cliques no link', 'clicks', 'cliques'),
+    results:   findCol(headers, 'results', 'resultados', 'conversions', 'conversões'),
+    indicator: findCol(headers, 'indicador de resultados', 'result indicator', 'optimization goal'),
+    cpr:       findCol(headers, 'cost per result', 'custo por resultado', 'cost / conv', 'custo / conv'),
+    budget:    findCol(headers, 'budget', 'orçamento', 'daily budget'),
+    status:    findCol(headers, 'delivery', 'veiculação', 'campaign status', 'status'),
+    followers: findCol(headers, 'seguidores no instagram', 'instagram followers', 'follows'),
   }
 
   if (C.name === -1) return null
@@ -99,33 +101,47 @@ export function parseMetricsCSV(text) {
   if (rows.length === 0) return null
 
   const campaigns = rows.map((row, i) => {
-    const name   = row[C.name] || `Campanha ${i + 1}`
-    const spent  = C.spent  >= 0 ? parseNum(row[C.spent])  : 0
-    const impr   = C.impr   >= 0 ? parseNum(row[C.impr])   : 0
-    const clicks = C.clicks >= 0 ? parseNum(row[C.clicks]) : 0
-    const leads  = C.leads  >= 0 ? parseNum(row[C.leads])  : 0
-    const cpl    = leads > 0 ? +(spent / leads).toFixed(2) : (C.cpl >= 0 ? parseNum(row[C.cpl]) : 0)
-    const budget = C.budget >= 0 ? parseNum(row[C.budget]) : +(spent * 1.25).toFixed(2)
-    const sr     = C.status >= 0 ? (row[C.status] || '').toLowerCase() : 'active'
-    const status = (sr.includes('ativ') || sr.includes('active') || sr.includes('enabled') || sr.includes('habilitad')) ? 'ativa' : 'pausada'
+    const name      = row[C.name] || `Campanha ${i + 1}`
+    const spent     = C.spent    >= 0 ? parseNum(row[C.spent])    : 0
+    const results   = C.results  >= 0 ? parseNum(row[C.results])  : 0
+    const cpr       = C.cpr      >= 0 ? parseNum(row[C.cpr])      : (results > 0 ? +(spent / results).toFixed(2) : 0)
+    const budget    = C.budget   >= 0 ? parseNum(row[C.budget])   : +(spent * 1.25).toFixed(2)
+    const followers = C.followers >= 0 ? parseNum(row[C.followers]) : 0
+    const sr        = C.status   >= 0 ? (row[C.status] || '').toLowerCase() : 'active'
+    const status    = (sr.includes('ativ') || sr.includes('active') || sr.includes('enabled') || sr.includes('habilitad')) ? 'ativa' : 'pausada'
+
+    // Detect campaign type from result indicator column
+    const indicator = C.indicator >= 0 ? (row[C.indicator] || '').toLowerCase() : ''
+    const isLeadCampaign = indicator.includes('messaging') || indicator.includes('lead') ||
+      indicator.includes('conversion') || indicator.includes('purchase') ||
+      name.toLowerCase().includes('whatsapp') || name.toLowerCase().includes('lead')
+    const type = isLeadCampaign ? 'whatsapp' : 'seguidores'
+
     let platform = isMeta ? 'meta' : isGoogle ? 'google' : 'meta'
     const det = platformFromName(name)
     if (det) platform = det
-    return { id: i + 1, name, platform, area: 'Trabalhista', status, budget: +budget.toFixed(2), spent: +spent.toFixed(2), leads: Math.round(leads), cpl, _i: impr, _c: clicks }
+
+    return {
+      id: i + 1, name, platform, type, area: 'Trabalhista', status,
+      budget: +budget.toFixed(2), spent: +spent.toFixed(2),
+      leads: isLeadCampaign ? Math.round(results) : 0,
+      results: Math.round(results),
+      cpl: isLeadCampaign ? cpr : 0,
+      costPerResult: cpr,
+      followers: Math.round(followers),
+    }
   })
 
-  const totalInvestment  = +campaigns.reduce((s, c) => s + c.spent, 0).toFixed(2)
-  const totalLeads       = campaigns.reduce((s, c) => s + c.leads, 0)
-  const totalImpressions = Math.round(campaigns.reduce((s, c) => s + c._i, 0))
-  const totalClicks      = Math.round(campaigns.reduce((s, c) => s + c._c, 0))
+  const totalInvestment = +campaigns.reduce((s, c) => s + c.spent, 0).toFixed(2)
+  const totalLeads      = campaigns.reduce((s, c) => s + c.leads, 0)
+  const totalFollowers  = campaigns.reduce((s, c) => s + c.followers, 0)
+  const totalProfileVisits = campaigns.filter(c => c.type === 'seguidores').reduce((s, c) => s + c.results, 0)
 
   const byPlat = {}
   campaigns.forEach(c => {
     if (!byPlat[c.platform]) byPlat[c.platform] = { investment: 0, leads: 0, impressions: 0, clicks: 0 }
-    byPlat[c.platform].investment  += c.spent
-    byPlat[c.platform].leads       += c.leads
-    byPlat[c.platform].impressions += c._i
-    byPlat[c.platform].clicks      += c._c
+    byPlat[c.platform].investment += c.spent
+    byPlat[c.platform].leads      += c.leads
   })
 
   const platformMetrics = Object.entries(byPlat).map(([platform, d]) => ({
@@ -133,12 +149,10 @@ export function parseMetricsCSV(text) {
     investment:  +d.investment.toFixed(2),
     leads:       d.leads,
     costPerLead: d.leads > 0 ? +(d.investment / d.leads).toFixed(2) : 0,
-    impressions: Math.round(d.impressions),
-    clicks:      Math.round(d.clicks),
-    ctr:         d.impressions > 0 ? +(d.clicks / d.impressions * 100).toFixed(2) : 0,
+    impressions: 0, clicks: 0, ctr: 0,
   }))
 
-  const cleanCampaigns = campaigns.map(({ _i, _c, ...c }) => c)
+  const cleanCampaigns = campaigns
 
   return {
     campaigns: cleanCampaigns,
@@ -146,9 +160,9 @@ export function parseMetricsCSV(text) {
       totalInvestment,
       totalLeads,
       costPerLead:      totalLeads > 0 ? +(totalInvestment / totalLeads).toFixed(2) : 0,
-      conversionRate:   totalClicks > 0 ? +(totalLeads / totalClicks * 100).toFixed(2) : 0,
-      totalImpressions,
-      totalClicks,
+      totalFollowers,
+      totalProfileVisits,
+      activeCampaigns:  campaigns.filter(c => c.status === 'ativa').length,
     },
     platformMetrics,
     leadsTimeline:    sampleTimeline,

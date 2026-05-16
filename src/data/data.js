@@ -14,18 +14,16 @@ export const CRM_STATUS = {
 }
 
 export const overviewMetrics = {
-  totalInvestment: 8640,
-  totalLeads: 214,
-  costPerLead: 40.37,
-  conversionRate: 3.8,
-  totalImpressions: 542000,
-  totalClicks: 9800,
+  totalInvestment: 2614.70,
+  totalLeads: 107,
+  costPerLead: 6.77,
+  totalFollowers: 1547,
+  totalProfileVisits: 4388,
+  activeCampaigns: 3,
 }
 
 export const platformMetrics = [
-  { platform: 'google', investment: 4200, leads: 112, costPerLead: 37.50, impressions: 280000, clicks: 5200, ctr: 1.86 },
-  { platform: 'meta',   investment: 3440, leads: 86,  costPerLead: 40.00, impressions: 220000, clicks: 3800, ctr: 1.73 },
-  { platform: 'tiktok', investment: 1000, leads: 16,  costPerLead: 62.50, impressions: 42000,  clicks: 800,  ctr: 1.90 },
+  { platform: 'meta', investment: 2614.70, leads: 107, costPerLead: 6.77, impressions: 0, clicks: 0, ctr: 0 },
 ]
 
 export const leadsTimeline = [
@@ -54,14 +52,15 @@ export const areaDistribution = [
   { area: 'Trânsito',       value: 10,  color: '#a855f7' },
 ]
 
+export const CAMPAIGN_TYPES = {
+  whatsapp:   { label: 'WhatsApp Leads', color: '#25D366', bg: 'rgba(37,211,102,0.15)' },
+  seguidores: { label: 'Seguidores',     color: '#a855f7', bg: 'rgba(168,85,247,0.15)' },
+}
+
 export const campaigns = [
-  { id:1, name:'Demissão Sem Justa Causa - Search',  platform:'google', area:'Trabalhista', status:'ativa',   budget:80,  spent:62.4, leads:8,  cpl:7.80 },
-  { id:2, name:'FGTS e Rescisão - Remarketing',      platform:'google', area:'Trabalhista', status:'ativa',   budget:60,  spent:54.2, leads:6,  cpl:9.03 },
-  { id:3, name:'Caminhoneiros - Direitos Trabalhistas',platform:'meta', area:'Trabalhista', status:'ativa',   budget:70,  spent:65.3, leads:11, cpl:5.94 },
-  { id:4, name:'Consumidor vs Banco - Feed',         platform:'meta',   area:'Consumidor',  status:'ativa',   budget:50,  spent:47.1, leads:9,  cpl:5.23 },
-  { id:5, name:'Plano de Saúde Negou - Stories',     platform:'meta',   area:'Consumidor',  status:'ativa',   budget:45,  spent:40.8, leads:7,  cpl:5.83 },
-  { id:6, name:'Hora Extra Não Paga - TikTok',       platform:'tiktok', area:'Trabalhista', status:'ativa',   budget:40,  spent:35.8, leads:5,  cpl:7.16 },
-  { id:7, name:'Acidente de Trabalho - Search',      platform:'google', area:'Trabalhista', status:'pausada', budget:55,  spent:0,    leads:0,  cpl:0    },
+  { id:1, name:'01 [TRÁFEGO] [WHATSAPP]',      platform:'meta', type:'whatsapp',   area:'Trabalhista', status:'ativa', budget:50, spent:724.34,  leads:107, results:107,  cpl:6.77, costPerResult:6.77,  followers:9    },
+  { id:2, name:'[TRÁFEGO] [SEGUIDORES]',        platform:'meta', type:'seguidores', area:'Geral',       status:'ativa', budget:70, spent:1859.19, leads:0,   results:4096, cpl:0,    costPerResult:0.45,  followers:1518 },
+  { id:3, name:'HIALLY | TRÁFEGO | SEGUIDORES', platform:'meta', type:'seguidores', area:'Geral',       status:'ativa', budget:5,  spent:31.17,   leads:0,   results:292,  cpl:0,    costPerResult:0.11,  followers:20   },
 ]
 
 export const crmLeads = [
