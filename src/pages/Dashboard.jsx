@@ -27,8 +27,8 @@ export default function Dashboard() {
 
   return (
     <div>
-      <div className="mb-6">
-        <h1 className="font-display text-3xl font-bold text-white">Dashboard</h1>
+      <div className="mb-5">
+        <h1 className="font-display text-2xl md:text-3xl font-bold text-white">Dashboard</h1>
         <p className="text-white/30 text-sm mt-1">
           {isCustom ? 'Dados importados do CSV' : 'Visão geral das campanhas — Maio 2026'}
         </p>

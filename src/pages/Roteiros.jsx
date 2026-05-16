@@ -58,7 +58,7 @@ export default function Roteiros() {
             </button>
           ))}
         </div>
-        <div className="ml-auto flex items-center gap-4 text-xs text-white/30">
+        <div className="hidden sm:flex ml-auto items-center gap-4 text-xs text-white/30">
           {Object.entries(STATUS_ROTEIRO).map(([k, s]) => (
             <span key={k} className="flex items-center gap-1.5">
               <span className="w-2 h-2 rounded-full" style={{ background: s.color }} />

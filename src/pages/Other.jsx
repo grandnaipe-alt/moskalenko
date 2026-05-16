@@ -46,7 +46,7 @@ export function Campanhas() {
       </div>
 
       <div className="glass rounded-2xl overflow-x-auto">
-        <table className="w-full">
+        <table className="w-full min-w-[700px]">
           <thead>
             <tr className="border-b border-white/5">
               {['Campanha','Plataforma','Área','Status','Orçamento','Gasto','Leads','CPL','Ações'].map(h => (

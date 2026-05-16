@@ -20,7 +20,7 @@ export default function CRM() {
 
   return (
     <div>
-      <div className="flex items-center justify-between mb-8">
+      <div className="flex items-center justify-between mb-6">
         <div>
           <h1 className="font-display text-3xl font-bold text-white">CRM</h1>
           <p className="text-white/30 text-sm mt-1">Gestão de leads e relacionamentos</p>
@@ -64,12 +64,12 @@ export default function CRM() {
 
       {/* Kanban */}
       {view === 'kanban' ? (
-        <div className="grid grid-cols-5 gap-4 overflow-x-auto pb-4">
+        <div className="flex gap-4 overflow-x-auto pb-4 -mx-4 px-4 md:mx-0 md:px-0">
           {COLS.map(col => {
             const colLeads = filtered.filter(l => l.status === col)
             const s = CRM_STATUS[col]
             return (
-              <div key={col} className="min-w-[190px]">
+              <div key={col} className="min-w-[200px] flex-shrink-0">
                 <div className="flex items-center gap-2 mb-3">
                   <div className="w-2 h-2 rounded-full" style={{ background: s.color }} />
                   <span className="text-white/50 text-xs font-medium">{s.label}</span>

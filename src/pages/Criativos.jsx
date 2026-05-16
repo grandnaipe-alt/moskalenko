@@ -129,7 +129,7 @@ export default function Criativos() {
   }
 
   return (
-    <div className="flex flex-col h-[calc(100vh-5rem)]">
+    <div className="flex flex-col h-[calc(100vh-7rem)] md:h-[calc(100vh-5rem)]">
       <div className="mb-6 flex-shrink-0">
         <h1 className="font-display text-3xl font-bold text-white">IA Criativos</h1>
         <p className="text-white/30 text-sm mt-1">Gere prompts e legendas com a identidade da Moskalenko</p>
